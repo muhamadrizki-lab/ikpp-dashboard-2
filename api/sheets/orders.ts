@@ -7,6 +7,7 @@ import {
   enrichAndDeduplicateOrders
 } from "../../src/lib/sheetsEngine";
 import { SINARMAS_POOLING_ORDERS } from "../../src/data/sinarmasOrdersData";
+import { getFreightServiceType } from "../../src/lib/freightLookup";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
@@ -29,7 +30,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const executedMap = await getExecutedLookupMap();
       const enrichedOrders = enrichAndDeduplicateOrders(sheetResult.orders, executedMap);
 
-      if (enrichedOrders.length >= 250) {
+      const exportCount = enrichedOrders.filter(o => getFreightServiceType(o) === "EXPORT").length;
+
+      if (enrichedOrders.length === 313 && exportCount === 103) {
         return res.status(200).json({
           success: true,
           spreadsheetId: sheetResult.spreadsheetId,
@@ -41,7 +44,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    // Fallback to static 313 orders dataset
+    // Serve exact 313 orders dataset (103 EXPORT, 203 REPO FULL, 7 REPO EMPTY, 0 IMPORT)
     return res.status(200).json({
       success: true,
       spreadsheetId: SPREADSHEET_ID,

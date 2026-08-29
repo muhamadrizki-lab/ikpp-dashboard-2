@@ -64,6 +64,12 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
     case "cancelled":
       classes = "bg-rose-50 text-rose-700 border border-rose-200/60 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800";
       break;
+
+    // Testing -> NEUTRAL SLATE
+    case "testing":
+    case "test":
+      classes = "bg-slate-100 text-slate-700 border border-slate-300/70 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700";
+      break;
   }
 
   // Capitalize for display
@@ -84,6 +90,8 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
     displayLabel = "Repo Service";
   } else if (normalized === "repo pdt" || normalized === "repo_pdt") {
     displayLabel = "Repo PDT";
+  } else if (normalized === "testing" || normalized === "test") {
+    displayLabel = "Testing";
   }
 
   return (
@@ -94,6 +102,7 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
         normalized === "in progress" || normalized === "in_progress" || normalized === "on trip" || normalized === "on_trip" || normalized === "utilized" || normalized === "impor" || normalized === "import" ? "bg-blue-500" :
         normalized === "repo empty" || normalized === "repo_empty" || normalized === "repo pdt" || normalized === "repo_pdt" ? "bg-purple-500" :
         normalized === "downtime" || normalized === "maintenance" ? "bg-rose-500" :
+        normalized === "testing" || normalized === "test" ? "bg-slate-400 dark:bg-slate-500" :
         "bg-emerald-500"
       }`}></span>
       {displayLabel}

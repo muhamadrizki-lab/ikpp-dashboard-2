@@ -1,4 +1,4 @@
-export type FreightServiceType = "EXPORT" | "REPO FULL" | "REPO EMPTY" | "IMPORT";
+export type FreightServiceType = "EXPORT" | "REPO FULL" | "REPO EMPTY" | "IMPORT" | "TESTING";
 
 export interface FreightMapping {
   commercialRoute: string;
@@ -65,6 +65,21 @@ function normalizeStr(str?: string): string {
 }
 
 /**
+ * Checks if a commercial route indicates a testing route
+ */
+export function isTestingCommercialRoute(commercialRoute?: string): boolean {
+  if (!commercialRoute) return false;
+  const cr = commercialRoute.trim().toUpperCase();
+  return (
+    cr === "TESTING" ||
+    cr.includes("TESTING") ||
+    cr === "TEST" ||
+    cr.startsWith("TESTING") ||
+    cr.startsWith("TEST ")
+  );
+}
+
+/**
  * Performs lookup for FREIGHT TYPE and FREIGHT TYPE 2 from COMMERCIAL ROUTE and locations
  */
 export function lookupFreightByRoute(
@@ -74,6 +89,15 @@ export function lookupFreightByRoute(
   rawFreightType?: string,
   rawFreightType2?: string
 ): FreightLookupResult {
+  // 0. Check if commercial route is testing -> Exclude from Freight Type 2 counts
+  if (isTestingCommercialRoute(commercialRoute)) {
+    return {
+      freightType: rawFreightType && rawFreightType.trim().toUpperCase() !== "EXPORT" ? rawFreightType : "TESTING",
+      freightType2: "TESTING",
+      orderType: "ekspor"
+    };
+  }
+
   const normCR = normalizeStr(commercialRoute);
   const normPick = normalizeStr(pickUpLocation);
   const normDrop = normalizeStr(dropOfLocation);
@@ -201,13 +225,19 @@ export function lookupFreightByRoute(
 }
 
 /**
- * Helper to get the canonical Service Type (EXPORT | REPO FULL | REPO EMPTY | IMPORT) for any order or shipment
+ * Helper to get the canonical Service Type (EXPORT | REPO FULL | REPO EMPTY | IMPORT | TESTING) for any order or shipment
  */
 export function getFreightServiceType(item: any): FreightServiceType {
   if (!item) return "EXPORT";
 
+  // Check if commercial route is testing -> Exclude from freight type 2 (EXPORT, REPO FULL, REPO EMPTY, IMPORT)
+  if (isTestingCommercialRoute(item.commercialRoute)) {
+    return "TESTING";
+  }
+
   if (item.freightType2) {
     const f2 = String(item.freightType2).trim().toUpperCase();
+    if (f2 === "TESTING" || f2.includes("TESTING") || f2 === "TEST") return "TESTING";
     if (f2 === "REPO FULL" || f2.includes("REPO FULL")) return "REPO FULL";
     if (f2 === "REPO EMPTY" || f2.includes("REPO EMPTY") || f2.includes("EMPTY")) return "REPO EMPTY";
     if (f2 === "IMPORT" || f2.includes("IMPOR")) return "IMPORT";

@@ -122,10 +122,12 @@ export default function Header({ title, subtitle, onMenuClick, isSidebarOpen, sh
       {/* Right side controls */}
       <div className="flex items-center gap-2 md:gap-3 lg:gap-4 shrink-0">
         {/* Language Switcher Pill Toggle EN | ID */}
-        <div className="bg-slate-100/90 dark:bg-slate-800 p-1 rounded-full flex items-center gap-1 border border-slate-200/80 dark:border-slate-700 shadow-inner shrink-0">
+        <div className="bg-slate-100/90 dark:bg-slate-800 p-1 rounded-full flex items-center gap-1 border border-slate-200/80 dark:border-slate-700 shadow-inner shrink-0 pointer-events-none select-none opacity-80 cursor-not-allowed">
           <button
+            type="button"
+            disabled
             onClick={() => handleSetLanguage("EN")}
-            className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold transition-all pointer-events-none cursor-not-allowed ${
               language === "EN"
                 ? "bg-white dark:bg-slate-700 text-sky-700 dark:text-sky-300 shadow-xs ring-1 ring-slate-200/60 dark:ring-slate-600"
                 : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
@@ -134,8 +136,10 @@ export default function Header({ title, subtitle, onMenuClick, isSidebarOpen, sh
             EN
           </button>
           <button
+            type="button"
+            disabled
             onClick={() => handleSetLanguage("ID")}
-            className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold transition-all pointer-events-none cursor-not-allowed ${
               language === "ID"
                 ? "bg-white dark:bg-slate-700 text-sky-700 dark:text-sky-300 shadow-xs ring-1 ring-slate-200/60 dark:ring-slate-600"
                 : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"

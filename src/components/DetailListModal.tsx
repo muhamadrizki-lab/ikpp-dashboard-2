@@ -266,7 +266,7 @@ export default function DetailListModal({
                       const commRoute = item.commercialRoute || (effType === "REPO EMPTY" ? "Depo Arround Priok - Pancaran Depo - 0 - 36" : "");
 
                       return (
-                        <tr key={item.id || idx} className="hover:bg-sky-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                        <tr key={item.uniqueKey || `modal-pool-${item.id || "item"}-${idx}`} className="hover:bg-sky-50/50 dark:hover:bg-slate-800/50 transition-colors">
                           <td className="px-3 py-2.5 font-mono font-bold text-sky-900 dark:text-sky-300 whitespace-nowrap">
                             {item.id || ""}
                           </td>
@@ -329,7 +329,7 @@ export default function DetailListModal({
                       const commRoute = item.commercialRoute || (effType === "REPO EMPTY" ? "Depo Arround Priok - Pancaran Depo - 0 - 36" : "");
 
                       return (
-                        <tr key={item.id || idx} className="hover:bg-sky-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                        <tr key={item.uniqueKey || `modal-ship-${item.id || "ship"}-${idx}`} className="hover:bg-sky-50/50 dark:hover:bg-slate-800/50 transition-colors">
                           <td className="px-3 py-2.5 font-mono font-bold text-sky-900 dark:text-sky-300 whitespace-nowrap">
                             {item.id}
                           </td>

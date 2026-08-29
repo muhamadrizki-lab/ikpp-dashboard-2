@@ -255,7 +255,7 @@ export default function StockRepoView({
               </tr>
             ) : (
               displayList.map((item, idx) => (
-                <tr key={item.id} className="hover:bg-blue-50/30 dark:hover:bg-slate-800/50 transition-colors">
+                <tr key={item.id ? `${item.id}_${idx}` : `stock-${idx}`} className="hover:bg-blue-50/30 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="p-3 text-center font-bold text-gray-400 dark:text-slate-500">{idx + 1}</td>
                   <td className="p-3 font-black text-blue-600 dark:text-blue-400 text-xs">{item.fo || "-"}</td>
                   <td className="p-3">

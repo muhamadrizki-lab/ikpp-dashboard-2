@@ -236,7 +236,7 @@ export default function LaporanRitaseView({
                 </tr>
               ) : (
                 filteredRitase.map((r, idx) => (
-                  <tr key={r.id} className="hover:bg-blue-50/30 dark:hover:bg-slate-800/50 transition-colors">
+                  <tr key={r.id ? `${r.id}_${idx}` : `ritase-${idx}`} className="hover:bg-blue-50/30 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="p-3 text-center font-bold text-gray-400 dark:text-slate-500">{idx + 1}</td>
                     <td className="p-3 text-[11px] font-medium text-gray-500 dark:text-slate-400 whitespace-nowrap">
                       {r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleString("id-ID") : "-"}

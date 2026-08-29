@@ -355,7 +355,7 @@ export default function TikProDashboardMirror({ data, loading, error, onRefresh 
                 </tr>
               ) : (
                 filteredTrucks.map((truck, idx) => (
-                  <tr key={truck.id} className="hover:bg-blue-50/30 dark:hover:bg-slate-800/50 transition-colors">
+                  <tr key={truck.id ? `${truck.id}_${idx}` : `tikpro-${idx}`} className="hover:bg-blue-50/30 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="p-3 text-center font-bold text-gray-400 dark:text-slate-500 text-xs">
                       {idx + 1}
                     </td>

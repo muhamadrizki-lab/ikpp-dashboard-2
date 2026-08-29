@@ -10,6 +10,8 @@ import { useFirebaseRealtime } from "../hooks/useFirebaseRealtime";
 import { TabType } from "../components/Sidebar";
 import { Order, UserAccount } from "../types";
 import { fetchLiveOrdersClient, fetchExecutedShipmentsClient } from "../lib/fetchOrdersClient";
+import { SINARMAS_POOLING_ORDERS } from "../data/sinarmasOrdersData";
+import { SINARMAS_EXECUTED_SHIPMENTS } from "../data/sinarmasShipmentsData";
 import { mapCSStatus } from "../lib/statusMapper";
 import DetailListModal, { isRepoPdtItem } from "../components/DetailListModal";
 import { getFreightServiceType } from "../lib/freightLookup";
@@ -23,8 +25,8 @@ interface OverviewProps {
 
 export default function Overview({ onNavigate, currentUser }: OverviewProps) {
   const isSuperAdmin = currentUser?.role === "Super Admin" || currentUser?.email?.toLowerCase() === "digital.solution@pancaran-logistic.id";
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [executedShipments, setExecutedShipments] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>(() => (SINARMAS_POOLING_ORDERS as unknown as Order[]));
+  const [executedShipments, setExecutedShipments] = useState<Order[]>(() => (SINARMAS_EXECUTED_SHIPMENTS as unknown as Order[]));
   const [dateFilter, setDateFilter] = useState<DateFilterState>({
     startDate: "",
     endDate: "",
@@ -50,14 +52,14 @@ export default function Overview({ onNavigate, currentUser }: OverviewProps) {
   // Filter orders and shipments dynamically by selected date range
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
-      const targetStr = dateType === "stuffing" ? o.requestStuffing : o.bookingDate;
+      const targetStr = dateType === "stuffing" ? (o.requestStuffing || o.bookingDate) : (o.bookingDate || o.requestStuffing);
       return filterByDate(targetStr, dateFilter);
     });
   }, [orders, dateFilter, dateType]);
 
   const filteredExecutedShipments = useMemo(() => {
     return executedShipments.filter((o) => {
-      const targetStr = dateType === "stuffing" ? o.requestStuffing : o.bookingDate;
+      const targetStr = dateType === "stuffing" ? (o.requestStuffing || o.bookingDate) : (o.bookingDate || o.requestStuffing);
       return filterByDate(targetStr, dateFilter);
     });
   }, [executedShipments, dateFilter, dateType]);

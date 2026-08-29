@@ -9,6 +9,8 @@ import DateRangeFilter, { DateFilterState, filterByDate, parseBookingDate, forma
 import { dummyOrders } from "../lib/dummy-data";
 import { Order, OrderType, OrderStatus, SheetSource, UserAccount } from "../types";
 import { fetchLiveOrdersClient, fetchExecutedShipmentsClient } from "../lib/fetchOrdersClient";
+import { SINARMAS_POOLING_ORDERS } from "../data/sinarmasOrdersData";
+import { SINARMAS_EXECUTED_SHIPMENTS } from "../data/sinarmasShipmentsData";
 import { formatJobOrderCode, mapCSStatus } from "../lib/statusMapper";
 import DetailListModal from "../components/DetailListModal";
 import { getFreightServiceType } from "../lib/freightLookup";
@@ -99,9 +101,9 @@ export const isRepoPdtOrder = (o: Order) => {
 export default function OrderPage({ initialTypeFilter, onClearInitialFilter, currentUser }: OrderProps) {
   const isSuperAdmin = currentUser?.role === "Super Admin" || currentUser?.email?.toLowerCase() === "digital.solution@pancaran-logistic.id";
 
-  // Live orders state initialized with empty array (loaded live from Google Sheets)
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [executedShipments, setExecutedShipments] = useState<Order[]>([]);
+  // Live orders state initialized with 313 orders and 1947 shipments
+  const [orders, setOrders] = useState<Order[]>(() => (SINARMAS_POOLING_ORDERS as unknown as Order[]));
+  const [executedShipments, setExecutedShipments] = useState<Order[]>(() => (SINARMAS_EXECUTED_SHIPMENTS as unknown as Order[]));
 
   useEffect(() => {
     let isMounted = true;

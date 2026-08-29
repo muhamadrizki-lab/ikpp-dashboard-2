@@ -643,9 +643,9 @@ export async function fetchSheetData(source: {
   );
 
   const csvUrls = [
-    `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&gid=${gid}`,
     `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`,
-    `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv`
+    `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv`,
+    `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&gid=${gid}`
   ];
 
   let csvContent = "";
@@ -657,7 +657,7 @@ export async function fetchSheetData(source: {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
         },
-        signal: AbortSignal.timeout(6000),
+        signal: AbortSignal.timeout(2500),
         redirect: "follow"
       });
       if (response.ok) {
@@ -793,13 +793,9 @@ export function enrichAndDeduplicateOrders(rawOrders: Order[], executedMap: Map<
   });
 
   if (poolingOrders.length > 0) {
-    const mergedMap = new Map<string, Order>();
-
-    for (const ord of poolingOrders) {
+    return poolingOrders.map((ord) => {
       const normKey = (ord.id || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-      if (!normKey) continue;
-
-      const execInfo = executedMap.get(normKey);
+      const execInfo = normKey ? executedMap.get(normKey) : null;
       const updated = { ...ord };
 
       if (execInfo) {
@@ -815,10 +811,8 @@ export function enrichAndDeduplicateOrders(rawOrders: Order[], executedMap: Map<
       }
 
       updated.status = resolveCSStatus(updated.lastUpdateCS).status;
-      mergedMap.set(normKey, updated);
-    }
-
-    return Array.from(mergedMap.values());
+      return updated;
+    });
   }
 
   return cleanOrders.map((ord) => ({

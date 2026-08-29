@@ -10,6 +10,7 @@ import DateRangeFilter, { DateFilterState, filterByDate, parseBookingDate, forma
 import { dummyShipments } from "../lib/dummy-data";
 import { Shipment, TripStatus } from "../types";
 import { fetchExecutedShipmentsClient } from "../lib/fetchOrdersClient";
+import { SINARMAS_EXECUTED_SHIPMENTS } from "../data/sinarmasShipmentsData";
 import { mapCSStatus, formatJobOrderCode } from "../lib/statusMapper";
 import { cleanVehiclePlate, cleanDriver } from "../lib/sheetsEngine";
 import DetailListModal from "../components/DetailListModal";
@@ -45,9 +46,34 @@ function CSStatusBadge({ status }: { status?: string }) {
   );
 }
 
+const initialShipmentList: Shipment[] = (SINARMAS_EXECUTED_SHIPMENTS as any[]).map((o: any, idx: number) => {
+  const { shipmentStatus } = mapCSStatus(o.lastUpdateCS);
+  const tripStatus: TripStatus = shipmentStatus;
+  return {
+    id: o.id || `SHP-${String(idx + 1).padStart(4, "0")}`,
+    orderRef: o.noJobOrder || o.orderRef || "",
+    type: o.type || "ekspor",
+    tripStatus,
+    unit: cleanVehiclePlate(o.vehiclePlate),
+    driver: cleanDriver(o.driver),
+    currentLocation: (o.statusRealtime || o.origin) && (o.statusRealtime || o.origin) !== "#N/A" && (o.statusRealtime || o.origin) !== "N/A" ? (o.statusRealtime || o.origin) : "",
+    eta: o.eta && o.eta !== "#N/A" && o.eta !== "N/A" ? o.eta : "",
+    bookingDate: o.bookingDate && o.bookingDate !== "#N/A" && o.bookingDate !== "N/A" ? o.bookingDate : "",
+    customer: o.customer || "INDAH KIAT PULP & PAPER TBK.",
+    quantity: 1,
+    lastUpdateCS: o.lastUpdateCS,
+    orderStatus: o.status,
+    commercialRoute: o.commercialRoute || "",
+    origin: o.origin || "",
+    destination: o.destination || "",
+    notes: o.notes || "",
+    requestStuffing: o.requestStuffing && o.requestStuffing !== "#N/A" && o.requestStuffing !== "N/A" ? o.requestStuffing : ""
+  };
+});
+
 export default function ShipmentPage() {
-  // Live Shipments state initialized to 0
-  const [shipments, setShipments] = useState<Shipment[]>([]);
+  // Live Shipments state initialized with 1947 shipments
+  const [shipments, setShipments] = useState<Shipment[]>(() => initialShipmentList);
 
   // Modal State for viewing detail list of clicked KPI
   const [detailModal, setDetailModal] = useState<{

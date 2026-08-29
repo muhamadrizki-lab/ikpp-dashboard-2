@@ -2,7 +2,7 @@ export type OrderType = "ekspor" | "impor" | "repo";
 export type OrderStatus = "open" | "in_progress" | "done" | "cancel";
 export type TripStatus = "pre_trip" | "on_trip" | "end_trip" | "cancel";
 export type UnitStatus = "utilized" | "standby" | "downtime";
-export type ServiceType = "EXPORT" | "REPO FULL" | "REPO EMPTY" | "IMPORT" | "TESTING";
+export type ServiceType = "EXPORT" | "REPO FULL" | "REPO EMPTY" | "IMPORT";
 
 export type UserRole = "Super Admin" | "Internal CS" | "Operations Staff" | "Fleet Dispatcher" | "Management Executive" | "Guest";
 export type UserStatus = "active" | "pending" | "inactive";

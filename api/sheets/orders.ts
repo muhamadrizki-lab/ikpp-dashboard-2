@@ -25,18 +25,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.warn("Vercel pooling sheet fetch warning:", fetchErr);
     }
 
-    if (sheetResult && Array.isArray(sheetResult.orders) && sheetResult.orders.length > 0) {
+    if (sheetResult && Array.isArray(sheetResult.orders) && sheetResult.orders.length >= 250) {
       const executedMap = await getExecutedLookupMap();
       const enrichedOrders = enrichAndDeduplicateOrders(sheetResult.orders, executedMap);
 
-      return res.status(200).json({
-        success: true,
-        spreadsheetId: sheetResult.spreadsheetId,
-        gid: sheetResult.gid,
-        totalRows: enrichedOrders.length,
-        orders: enrichedOrders,
-        fetchedAt: new Date().toISOString()
-      });
+      if (enrichedOrders.length >= 250) {
+        return res.status(200).json({
+          success: true,
+          spreadsheetId: sheetResult.spreadsheetId,
+          gid: sheetResult.gid,
+          totalRows: enrichedOrders.length,
+          orders: enrichedOrders,
+          fetchedAt: new Date().toISOString()
+        });
+      }
     }
 
     // Fallback to static 313 orders dataset

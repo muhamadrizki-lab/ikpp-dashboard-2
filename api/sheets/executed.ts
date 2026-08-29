@@ -25,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.warn("Vercel executed sheet fetch warning:", fetchErr);
     }
 
-    if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length > 0) {
+    if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length >= 1500) {
       const validExecutedOrders = executedSheet.orders.map((ord: any) => {
         let cleanId = (ord.id || "").trim();
         if (!cleanId || cleanId.toUpperCase().includes("JANGAN DI HAPUS")) {

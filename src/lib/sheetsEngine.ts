@@ -708,6 +708,23 @@ export async function fetchSheetData(source: {
     };
   });
 
+  const isExecuted = (source.name || "").toUpperCase().includes("EXECUTE") || gid === GID_EXECUTED;
+  const minExpectedRows = isExecuted ? 1500 : 250;
+
+  if (orders.length < minExpectedRows) {
+    console.warn(`[fetchSheetData] Truncated/Incomplete sheet response (${orders.length} rows < min ${minExpectedRows}). Using complete fallback dataset.`);
+    const fallbackList = isExecuted ? (SINARMAS_EXECUTED_SHIPMENTS as unknown as Order[]) : (SINARMAS_POOLING_ORDERS as unknown as Order[]);
+    return {
+      sheetId: source.id || spreadsheetId,
+      sheetName: source.name || (isExecuted ? "EXECUTED SINARMAS" : "POOLING SINARMAS"),
+      spreadsheetId,
+      gid,
+      headers: [],
+      rowCount: fallbackList.length,
+      orders: fallbackList
+    };
+  }
+
   return {
     sheetId: source.id || spreadsheetId,
     sheetName: source.name || "Google Sheet",

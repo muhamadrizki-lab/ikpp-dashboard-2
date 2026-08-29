@@ -21,7 +21,7 @@ export async function fetchLiveOrdersClient(): Promise<Order[]> {
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         const json = await res.json();
-        if (json.success && Array.isArray(json.orders) && json.orders.length > 0) {
+        if (json.success && Array.isArray(json.orders) && json.orders.length >= 250) {
           return json.orders;
         }
       }
@@ -40,9 +40,9 @@ export async function fetchLiveOrdersClient(): Promise<Order[]> {
       getExecutedLookupMap()
     ]);
 
-    if (poolingResult && Array.isArray(poolingResult.orders) && poolingResult.orders.length > 0) {
+    if (poolingResult && Array.isArray(poolingResult.orders) && poolingResult.orders.length >= 250) {
       const enriched = enrichAndDeduplicateOrders(poolingResult.orders as Order[], executedMap);
-      if (enriched.length > 0) {
+      if (enriched.length >= 250) {
         return enriched;
       }
     }
@@ -62,7 +62,7 @@ export async function fetchExecutedShipmentsClient(): Promise<Order[]> {
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         const json = await res.json();
-        if (json.success && Array.isArray(json.orders) && json.orders.length > 0) {
+        if (json.success && Array.isArray(json.orders) && json.orders.length >= 1500) {
           return json.orders;
         }
       }
@@ -78,7 +78,7 @@ export async function fetchExecutedShipmentsClient(): Promise<Order[]> {
       url: `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${GID_EXECUTED}`
     });
 
-    if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length > 0) {
+    if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length >= 1500) {
       const validExecuted = (executedSheet.orders as Order[]).map((ord: any) => {
         let cleanId = (ord.id || "").trim();
         if (!cleanId || cleanId.toUpperCase().includes("JANGAN DI HAPUS")) {

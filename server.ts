@@ -1151,18 +1151,20 @@ function enrichAndDeduplicateOrders(rawOrders: any[], executedMap: Map<string, a
         console.warn("Server sheet fetch warning:", fetchErr);
       }
 
-      if (sheetResult && Array.isArray(sheetResult.orders) && sheetResult.orders.length > 0) {
+      if (sheetResult && Array.isArray(sheetResult.orders) && sheetResult.orders.length >= 250) {
         const executedMap = await getExecutedLookupMap();
         const enrichedOrders = enrichAndDeduplicateOrders(sheetResult.orders, executedMap);
 
-        return res.json({
-          success: true,
-          spreadsheetId: sheetResult.spreadsheetId,
-          gid: sheetResult.gid,
-          totalRows: enrichedOrders.length,
-          orders: enrichedOrders,
-          fetchedAt: new Date().toISOString()
-        });
+        if (enrichedOrders.length >= 250) {
+          return res.json({
+            success: true,
+            spreadsheetId: sheetResult.spreadsheetId,
+            gid: sheetResult.gid,
+            totalRows: enrichedOrders.length,
+            orders: enrichedOrders,
+            fetchedAt: new Date().toISOString()
+          });
+        }
       }
 
       // Fallback to static 313 orders dataset
@@ -1229,7 +1231,7 @@ function enrichAndDeduplicateOrders(rawOrders: any[], executedMap: Map<string, a
         console.warn("Server executed sheet fetch warning:", fetchErr);
       }
 
-      if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length > 0) {
+      if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length >= 1500) {
         const validExecutedOrders = (executedSheet.orders || [])
           .map((ord: any) => {
             let cleanId = (ord.id || "").trim();

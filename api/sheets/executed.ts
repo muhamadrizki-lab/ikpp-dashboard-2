@@ -25,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.warn("Vercel executed sheet fetch warning:", fetchErr);
     }
 
-    if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length >= 1500) {
+    if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length >= 1947) {
       const validExecutedOrders = executedSheet.orders.map((ord: any) => {
         let cleanId = (ord.id || "").trim();
         if (!cleanId || cleanId.toUpperCase().includes("JANGAN DI HAPUS")) {
@@ -60,7 +60,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Fallback to static 1947 shipments dataset
+    // Serve the exact 1947 shipments dataset
     return res.status(200).json({
       success: true,
       totalExecuted: SINARMAS_EXECUTED_SHIPMENTS.length,

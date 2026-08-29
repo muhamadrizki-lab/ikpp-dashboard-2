@@ -709,7 +709,7 @@ export async function fetchSheetData(source: {
   });
 
   const isExecuted = (source.name || "").toUpperCase().includes("EXECUTE") || gid === GID_EXECUTED;
-  const minExpectedRows = isExecuted ? 1500 : 250;
+  const minExpectedRows = isExecuted ? 1947 : 250;
 
   if (orders.length < minExpectedRows) {
     console.warn(`[fetchSheetData] Truncated/Incomplete sheet response (${orders.length} rows < min ${minExpectedRows}). Using complete fallback dataset.`);

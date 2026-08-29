@@ -1231,7 +1231,7 @@ function enrichAndDeduplicateOrders(rawOrders: any[], executedMap: Map<string, a
         console.warn("Server executed sheet fetch warning:", fetchErr);
       }
 
-      if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length >= 1500) {
+      if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length >= 1947) {
         const validExecutedOrders = (executedSheet.orders || [])
           .map((ord: any) => {
             let cleanId = (ord.id || "").trim();

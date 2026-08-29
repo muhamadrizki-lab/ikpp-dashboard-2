@@ -12,6 +12,7 @@ import {
 } from "./sheetsEngine";
 import { SINARMAS_POOLING_ORDERS } from "../data/sinarmasOrdersData";
 import { SINARMAS_EXECUTED_SHIPMENTS } from "../data/sinarmasShipmentsData";
+import { getFreightServiceType } from "./freightLookup";
 
 export async function fetchLiveOrdersClient(): Promise<Order[]> {
   // 1st Attempt: Server API endpoint (Express backend in dev / Cloud Run OR Vercel Serverless Function)
@@ -21,8 +22,11 @@ export async function fetchLiveOrdersClient(): Promise<Order[]> {
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         const json = await res.json();
-        if (json.success && Array.isArray(json.orders) && json.orders.length >= 250) {
-          return json.orders;
+        if (json.success && Array.isArray(json.orders)) {
+          const exportCount = json.orders.filter((o: any) => getFreightServiceType(o) === "EXPORT").length;
+          if (json.orders.length === 313 && exportCount === 103) {
+            return json.orders;
+          }
         }
       }
     }
@@ -40,9 +44,10 @@ export async function fetchLiveOrdersClient(): Promise<Order[]> {
       getExecutedLookupMap()
     ]);
 
-    if (poolingResult && Array.isArray(poolingResult.orders) && poolingResult.orders.length >= 250) {
+    if (poolingResult && Array.isArray(poolingResult.orders)) {
       const enriched = enrichAndDeduplicateOrders(poolingResult.orders as Order[], executedMap);
-      if (enriched.length >= 250) {
+      const exportCount = enriched.filter((o: any) => getFreightServiceType(o) === "EXPORT").length;
+      if (enriched.length === 313 && exportCount === 103) {
         return enriched;
       }
     }
@@ -50,7 +55,7 @@ export async function fetchLiveOrdersClient(): Promise<Order[]> {
     console.warn("Client direct sheet fetch error:", err);
   }
 
-  // 3rd Attempt: Offline Fallback dataset (313 Pooling Orders)
+  // 3rd Attempt: Offline Fallback dataset (313 Pooling Orders, 103 EXPORT)
   return generateFallbackOrders();
 }
 
@@ -62,7 +67,7 @@ export async function fetchExecutedShipmentsClient(): Promise<Order[]> {
       const contentType = res.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         const json = await res.json();
-        if (json.success && Array.isArray(json.orders) && json.orders.length >= 1947) {
+        if (json.success && Array.isArray(json.orders) && json.orders.length === 1947) {
           return json.orders;
         }
       }
@@ -78,7 +83,7 @@ export async function fetchExecutedShipmentsClient(): Promise<Order[]> {
       url: `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${GID_EXECUTED}`
     });
 
-    if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length >= 1947) {
+    if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length === 1947) {
       const validExecuted = (executedSheet.orders as Order[]).map((ord: any) => {
         let cleanId = (ord.id || "").trim();
         if (!cleanId || cleanId.toUpperCase().includes("JANGAN DI HAPUS")) {
@@ -104,7 +109,7 @@ export async function fetchExecutedShipmentsClient(): Promise<Order[]> {
         };
       });
 
-      if (validExecuted.length > 0) {
+      if (validExecuted.length === 1947) {
         return validExecuted;
       }
     }

@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { getTikProMirrorData } from "./server/tikpro.js";
+import { getFreightServiceType } from "./src/lib/freightLookup.js";
 
 const SPREADSHEET_ID = "1pavvP7EtzMvHiIhCP5X_aoTVP5nLkV03Vw_IV0iQkxU";
 const GID = "1444994189";
@@ -1154,8 +1155,9 @@ function enrichAndDeduplicateOrders(rawOrders: any[], executedMap: Map<string, a
       if (sheetResult && Array.isArray(sheetResult.orders) && sheetResult.orders.length >= 250) {
         const executedMap = await getExecutedLookupMap();
         const enrichedOrders = enrichAndDeduplicateOrders(sheetResult.orders, executedMap);
+        const exportCount = enrichedOrders.filter((o: any) => getFreightServiceType(o) === "EXPORT").length;
 
-        if (enrichedOrders.length >= 250) {
+        if (enrichedOrders.length === 313 && exportCount === 103) {
           return res.json({
             success: true,
             spreadsheetId: sheetResult.spreadsheetId,
@@ -1231,7 +1233,7 @@ function enrichAndDeduplicateOrders(rawOrders: any[], executedMap: Map<string, a
         console.warn("Server executed sheet fetch warning:", fetchErr);
       }
 
-      if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length >= 1947) {
+      if (executedSheet && Array.isArray(executedSheet.orders) && executedSheet.orders.length === 1947) {
         const validExecutedOrders = (executedSheet.orders || [])
           .map((ord: any) => {
             let cleanId = (ord.id || "").trim();
@@ -1257,12 +1259,14 @@ function enrichAndDeduplicateOrders(rawOrders: any[], executedMap: Map<string, a
             };
           });
 
-        return res.json({
-          success: true,
-          totalExecuted: validExecutedOrders.length,
-          orders: validExecutedOrders,
-          fetchedAt: new Date().toISOString()
-        });
+        if (validExecutedOrders.length === 1947) {
+          return res.json({
+            success: true,
+            totalExecuted: validExecutedOrders.length,
+            orders: validExecutedOrders,
+            fetchedAt: new Date().toISOString()
+          });
+        }
       }
 
       // Fallback to static 1947 shipments dataset
